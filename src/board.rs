@@ -3,6 +3,7 @@
 use crate::renderer;
 use crate::cell;
 use crate::util::*;
+use crate::logic;
 
 #[derive(PartialEq, Eq, Copy, Clone)]
 pub enum SelectedCell {
@@ -12,8 +13,8 @@ pub enum SelectedCell {
 
 pub struct Board {
   pub cells: [cell::Cell; 81],
-  pub cellSelected: SelectedCell,
-  
+  //pub cellSelected: SelectedCell,
+  pub cellsSelected: Vec<u8>
 }
 
 impl Board {
@@ -21,7 +22,8 @@ impl Board {
     let empty = cell::Cell::newEmpty();
     Board {
       cells: [empty; 81],
-      cellSelected: SelectedCell::None
+      //cellSelected: SelectedCell::None
+      cellsSelected: vec![]
     }
   }
   pub fn handleClick(&mut self, x: i32, y: i32) -> SudokuEvent {
@@ -41,29 +43,38 @@ impl Board {
     }
     if (0..9).contains(&cellX) && (0..9).contains(&cellY) {
       println!("Clicked cell: {} = {}, {}", cellY * 9 + cellX, cellX, cellY);
-      match self.cellSelected {
-        SelectedCell::Cell( val) => {
-          if val != (cellY * 9 + cellX) as u8 {
-            return SudokuEvent::SelectCell { index: (cellY * 9 + cellX) as u8 }
-          }
-          return SudokuEvent::UnselectCell;
-        },
-        SelectedCell::None => {
-          return SudokuEvent::SelectCell { index: (cellY * 9 + cellX) as u8 }
-        }
+      if self.cellsSelected.contains(&((cellY * 9 + cellX) as u8)) {
+        return SudokuEvent::UnselectCell{ index: (cellY * 9 + cellX) as u8 };
+      } else {
+        return SudokuEvent::SelectCell { index: (cellY * 9 + cellX) as u8 }
       }
     }
     return SudokuEvent::None;
   }
-  pub fn unselectCell(&mut self) {
-    self.cellSelected = SelectedCell::None;
+  pub fn unselectCells(&mut self) {
+    self.cellsSelected.clear();
+  }
+  pub fn unselectCell(&mut self, index: &u8) {
+    self.cellsSelected.retain(|val| val != index);
   }
   pub fn selectCell(&mut self, index: u8) {
-    self.cellSelected = SelectedCell::Cell(index);
+    self.cellsSelected.push(index);
   }
-  pub fn setCell(&mut self, value: u8, state: cell::CellState) {
-    if let SelectedCell::Cell(index) = self.cellSelected {
-      self.cells[index as usize].setCell(value, state);
+  pub fn userSetCells(&mut self, value: u8) {
+    let validNumsFuncs = [ logic::getValidNums::inRow, logic::getValidNums::inCol, logic::getValidNums::inBox ];
+    for index in &self.cellsSelected {
+      if !self.cells[*index as usize].canUserChange() {
+        continue;
+      }
+      let mut validNums: Vec<u8> = vec![1,2,3,4,5,6,7,8,9];
+      logic::getValidNums::fromDispatch(&self.cells, *index as i8, &mut validNums, &validNumsFuncs);
+      if value == 0 {
+        self.cells[*index as usize].setCell(value, cell::CellState::EMPTY);
+      } else if validNums.contains(&value) {
+        self.cells[*index as usize].setCell(value, cell::CellState::USER_INPUT);
+      } else {
+        self.cells[*index as usize].setCell(value, cell::CellState::INCORRECT);
+      }
     }
   }
   pub fn render(&mut self, renderer: &mut renderer::Renderer) {
@@ -83,17 +94,8 @@ impl Board {
         lineThicknessUsedX += lines[x as usize];
         let cellX = x as i32 * CELL_WIDTH + lineThicknessUsedX + BOARD_X;
         let cellY = y as i32 * CELL_WIDTH + lineThicknessUsedY + BOARD_Y;
-        match self.cellSelected {
-          SelectedCell::Cell(index) if index == y * 9 + x => {
-            renderer.renderFillRect(cell::SELECTED_CELL, cellX, cellY, CELL_WIDTH as u32, CELL_WIDTH as u32);
-          },
-          SelectedCell::Cell(index) if x == index % 9 => {
-            renderer.renderFillRect(cell::SAME_COL_CELL, cellX, cellY, CELL_WIDTH as u32, CELL_WIDTH as u32);
-          },
-          SelectedCell::Cell(index) if y == index / 9 => {
-            renderer.renderFillRect(cell::SAME_ROW_CELL, cellX, cellY, CELL_WIDTH as u32, CELL_WIDTH as u32);
-          },
-          _ => {}
+        if self.cellsSelected.contains(&(y * 9 + x)) {
+          renderer.renderFillRect(cell::SELECTED_CELL, cellX, cellY, CELL_WIDTH as u32, CELL_WIDTH as u32);
         }
         let color: (u8,u8,u8,u8) = match self.cells[(y * 9 + x) as usize].state {
           cell::CellState::INCORRECT => (255,0,0,255),
@@ -109,7 +111,7 @@ impl Board {
     for cell in &mut self.cells {
       cell.setCell(0, cell::CellState::EMPTY);
     }
-    self.cellSelected = SelectedCell::None;
+    self.unselectCells();
   }
 
 }

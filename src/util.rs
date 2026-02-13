@@ -24,5 +24,5 @@ pub const WIN_TITLE: &str = "Sudoku";
 
 #[derive(PartialEq, Eq, Copy, Clone)]
 pub enum SudokuEvent {
-  None, NumBtn{ value: u8}, SolveBtn, CheckBtn, EraseBtn, MultiSelectBtn, UnselectCell, SelectCell{ index: u8 }, ButtonsLocked, ResetBtn
+  None, NumBtn{ value: u8}, SolveBtn, CheckBtn, EraseBtn, MultiSelectBtn, UnselectCell{ index: u8 }, SelectCell{ index: u8 }, ButtonsLocked, ResetBtn
 }

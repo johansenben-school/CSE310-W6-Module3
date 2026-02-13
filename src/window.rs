@@ -7,13 +7,11 @@ use sdl2::event::Event;
 use sdl2::mouse::MouseButton;
 
 
-use crate::board::SelectedCell;
 use crate::logic;
 use crate::renderer;
 use crate::board;
 use crate::sidebar::{SideBar};
 use crate::util::*;
-use crate::cell;
 
 pub struct Window<'a> {
   renderer: renderer::Renderer<'a>,
@@ -67,40 +65,30 @@ impl<'a> Window<'a> {
   pub fn update(&mut self) {
     match self.lastEvent {
       SudokuEvent::SelectCell { index } => {
+        if !self.sideBar.multiSelect {
+          self.board.unselectCells();
+        }
         self.board.selectCell(index);
       },
-      SudokuEvent::UnselectCell => {
-        self.board.unselectCell();
+      SudokuEvent::UnselectCell { index } => {
+        self.board.unselectCell(&index);
       },
       SudokuEvent::NumBtn{ value } => {
-        if let SelectedCell::Cell(index) = self.board.cellSelected {
-          if !self.board.cells[index as usize].canUserChange() {
-            return;
-          }
-          let validNumsFuncs = [ logic::getValidNums::inRow, logic::getValidNums::inCol, logic::getValidNums::inBox ];
-          let mut validNums: Vec<u8> = vec![1,2,3,4,5,6,7,8,9];
-          logic::getValidNums::fromDispatch(&self.board.cells, index as i8, &mut validNums, &validNumsFuncs);
-          if validNums.contains(&value) {
-            self.board.setCell(value, cell::CellState::USER_INPUT);
-          } else {
-            self.board.setCell(value, cell::CellState::INCORRECT);
-          }
-        }
-        self.board.unselectCell();
+        self.board.userSetCells(value);
+        self.board.unselectCells();
       },
       SudokuEvent::SolveBtn => {
         logic::solve(&mut self.board.cells);
       },
       SudokuEvent::EraseBtn => {
-        if let SelectedCell::Cell(index) = self.board.cellSelected {
-          if self.board.cells[index as usize].canUserChange() {
-            self.board.setCell(0, cell::CellState::EMPTY);
-          }
-        }
-        self.board.unselectCell();
+        self.board.userSetCells(0);
+        self.board.unselectCells();
       },
       SudokuEvent::ResetBtn => {
         self.board.reset();
+      },
+      SudokuEvent::MultiSelectBtn => {
+        self.board.unselectCells();
       },
       _ => {}
     }
