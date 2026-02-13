@@ -12,7 +12,8 @@ pub enum SelectedCell {
 
 pub struct Board {
   pub cells: [cell::Cell; 81],
-  pub cellSelected: SelectedCell
+  pub cellSelected: SelectedCell,
+  
 }
 
 impl Board {

@@ -1,35 +1,25 @@
 # Overview
 
-{Important! Do not say in this section that this is college assignment. Talk about what you are trying to accomplish as a software engineer to further your learning.}
-
-{Provide a description of the software that you wrote to demonstrate the Rust language.}
-
-{Describe your purpose for writing this software.}
-
-{Provide a link to your YouTube demonstration. It should be a 4-5 minute demo of the software running and a walkthrough of the code. Focus should be on sharing what you learned about the language syntax.}
+Sudoku game with a solve button made using Rust and SDL2
 
 [Software Demo Video](http://youtube.link.goes.here)
 
 # Development Environment
 
-{Describe the tools that you used to develop the software}
-
-{Describe the programming language that you used and any libraries.}
+- Rust
+- SDL2 (for Rust)
+- VS Code
+- Mac OS
 
 # Useful Websites
-
-{Make a list of websites that you found helpful in this project}
 
 - [Web Site Name](http://url.link.goes.here)
 - [Web Site Name](http://url.link.goes.here)
 
 # Future Work
 
-{Make a list of things that you need to fix, improve, and add in the future.}
-
-- Item 1
-- Item 2
-- Item 3
+- Add a pencil/note option to take notes without actually placing a number
+- Add different types of sudoku puzzles with additional rules (example: killer sudoku)
 
 
 
@@ -37,4 +27,4 @@
 - Monday, Feb. 2 - 4 hours
 - Friday, Feb. 6 - 4 hours
 - Thurs, Feb 12 - 6 hours (10:30-1, 3-6:30)
-- Friday 10-11:30, 1-
+- Friday, Feb. 13 - 3 hours (10-11:30, 1-2:30)

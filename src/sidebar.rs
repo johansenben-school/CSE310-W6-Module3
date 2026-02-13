@@ -6,7 +6,9 @@ pub struct SideBar {
   numBtnCoords: [(i32, i32); 9],
   solveBtn: (i32, i32, i32, i32),
   eraseBtn: (i32, i32, i32, i32),
-  resetBtn: (i32, i32, i32, i32)
+  resetBtn: (i32, i32, i32, i32),
+  multiSelectBtn: (i32,i32,i32,i32),
+  pub multiSelect: bool
 }
 
 impl SideBar {
@@ -19,7 +21,9 @@ impl SideBar {
      ], 
      solveBtn: (0, 440, 320, 100),
      eraseBtn: (0, 330, 100, 100),
-     resetBtn: (110, 330, 100, 100)
+     resetBtn: (110, 330, 100, 100),
+     multiSelectBtn: (220, 330, 100, 100),
+     multiSelect: false
     }
   }
 
@@ -37,11 +41,12 @@ impl SideBar {
      }
 
      Self::renderTextBtn(renderer, "Solve", self.solveBtn);
-     Self::renderTextBtn(renderer, "X", self.eraseBtn);
-     Self::renderTextBtn(renderer, "R", self.resetBtn);
+     Self::renderTextBtn(renderer, "✖", self.eraseBtn);
+     Self::renderTextBtn(renderer, "↻", self.resetBtn);
+     Self::renderTextBtn(renderer, if self.multiSelect { "☐☐" } else { "☐" }, self.multiSelectBtn);
   }
 
-  pub fn handleClick(&self, x: i32, y: i32) -> SudokuEvent {
+  pub fn handleClick(&mut self, x: i32, y: i32) -> SudokuEvent {
     for i in 0..9 {
       let btnX = self.numBtnCoords[i].0;
       let btnY = self.numBtnCoords[i].1;
@@ -59,6 +64,10 @@ impl SideBar {
       },
       (xVal, yVal) if Self::isInRange(xVal, yVal, self.resetBtn) => {
         return SudokuEvent::ResetBtn;
+      },
+      (xVal, yVal) if Self::isInRange(xVal, yVal, self.multiSelectBtn) => {
+        self.multiSelect = !self.multiSelect;
+        return SudokuEvent::MultiSelectBtn;
       },
       _ => {
         return SudokuEvent::None;

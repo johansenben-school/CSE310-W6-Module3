@@ -20,7 +20,7 @@ pub const SIDE_BAR_X_RANGE: std::ops::Range<i32> = SIDE_BAR_X..(SIDE_BAR_X + SID
 
 pub const WIN_WIDTH: u32 = (BOARD_WIDTH + 20 * 2 + SIDE_BAR_WIDTH + SIDE_BAR_PADDING * 2) as u32;
 pub const WIN_HEIGHT: u32 = (BOARD_WIDTH + 20 * 2) as u32;
-pub const WIN_TITLE: &str = "Chess";
+pub const WIN_TITLE: &str = "Sudoku";
 
 #[derive(PartialEq, Eq, Copy, Clone)]
 pub enum SudokuEvent {
