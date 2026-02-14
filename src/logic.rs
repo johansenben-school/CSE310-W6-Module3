@@ -4,7 +4,7 @@ use crate::{cell::{Cell, CellState}, logic::getValidNums::placeEasyCells};
 pub mod getValidNums {
     use crate::cell::{Cell, CellState};
 
-
+  //gets all valid numbers in relation to the row
   pub fn inRow(board: &[Cell; 81], index: i8, validNums: &mut Vec<u8>) {
     let y: i8 = index / 9;
     for x in 0..9 {
@@ -19,6 +19,7 @@ pub mod getValidNums {
     }
   }
 
+  //gets all valid numbers in relation to the column
   pub fn inCol(board: &[Cell; 81], index: i8, validNums: &mut Vec<u8>) {
     let x: i8 = index % 9;
     for y in 0..9 {
@@ -33,6 +34,7 @@ pub mod getValidNums {
     }
   }
 
+  //gets all valid numbers in relation to the box
   pub fn inBox(board: &[Cell; 81], index: i8, validNums: &mut Vec<u8>) {
     let boxX = (index % 9) / 3;
     let boxY = (index / 9) / 3;
@@ -51,16 +53,20 @@ pub mod getValidNums {
     }
   }
 
+  //calls the rule functions that are passed
   pub fn fromDispatch(board: &[Cell; 81], index: i8, validNums: &mut Vec<u8>, funcs: &[fn(&[Cell;81], i8, &mut Vec<u8>)]) {
     for func in funcs {
       func(board, index, validNums);
     }
   }
 
+  //find cells that are easier to place to make the solve function more efficient
   pub fn placeEasyCells(board: &mut [Cell; 81], funcs: &[fn(&[Cell;81], i8, &mut Vec<u8>)]) {
-    let mut changedVal;
+    //loop runs until it cant find an easy cell placement
     loop {
-      changedVal = false;
+      let mut changedVal = false;
+
+      //check if a cell can only contain 1 number -> set it as that number
       for i in 0..81_i8 {
         if !board[i as usize].canSolverChange() {
           continue;
@@ -74,6 +80,7 @@ pub mod getValidNums {
         }
       }
 
+      //save the possible numbers for each cell
       let mut candidates: Vec<Vec<u8>> = vec![vec![]; 81];
       for i in 0..81 {
           if board[i].canSolverChange() {
@@ -82,6 +89,8 @@ pub mod getValidNums {
               candidates[i] = valid;
           }
       }
+
+      //check if a number can only be placed once in each row/column
       for rowOrCol in 0..9_u8 {
         for num in 1..=9_u8 {
           let mut countInRow: u8 = 0;
@@ -109,6 +118,7 @@ pub mod getValidNums {
         }
       }
 
+      //if a value hasn't changed -> all the easy placements are done -> break
       if !changedVal {
         break;
       }
@@ -121,6 +131,8 @@ pub enum SolveState {
   SOLVED, UNSOLVEABLE
 }
 pub fn solve(board: &mut [Cell; 81]) -> SolveState {
+
+  //check if puzzle is already solved
   let mut filledCells: u8 = 0;
   for cell in &mut *board {
     if !cell.isEmpty() {

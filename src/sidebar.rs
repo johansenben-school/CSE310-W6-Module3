@@ -31,22 +31,29 @@ impl SideBar {
     renderer.renderRect((0,0,0,255), SIDE_BAR_X + rect.0, SIDE_BAR_Y + rect.1, rect.2 as u32, rect.3 as u32);
     renderer.renderCenteredText(text, (0,0,0,255), SIDE_BAR_X + rect.0, SIDE_BAR_Y + rect.1, rect.2, rect.3);
   }
+
   fn isInRange(x: i32, y: i32, rect: (i32, i32, i32, i32)) -> bool{
     (rect.0..(rect.0 + rect.2)).contains(&x) && (rect.1..(rect.1 + rect.3)).contains(&y)
   }
 
+
   pub fn render(&self, renderer: &mut Renderer) {
+    //number buttons
      for i in 0..9 {
       Self::renderTextBtn(renderer, (i + 1).to_string().as_str(), (self.numBtnCoords[i].0, self.numBtnCoords[i].1, CELL_WIDTH, CELL_WIDTH));
      }
 
+     //other buttons
      Self::renderTextBtn(renderer, "Solve", self.solveBtn);
      Self::renderTextBtn(renderer, "✖", self.eraseBtn);
      Self::renderTextBtn(renderer, "↻", self.resetBtn);
      Self::renderTextBtn(renderer, if self.multiSelect { "☐☐" } else { "☐" }, self.multiSelectBtn);
   }
 
+  //returns the event type; window.update handles the event
   pub fn handleClick(&mut self, x: i32, y: i32) -> SudokuEvent {
+
+    //was a number button clicked
     for i in 0..9 {
       let btnX = self.numBtnCoords[i].0;
       let btnY = self.numBtnCoords[i].1;
@@ -55,6 +62,8 @@ impl SideBar {
         return SudokuEvent::NumBtn {value: (i + 1) as u8};
       }
      }
+
+     //other buttons
      match (x, y) {
       (xVal, yVal) if Self::isInRange(xVal, yVal, self.solveBtn) => {
         return SudokuEvent::SolveBtn;
@@ -69,8 +78,9 @@ impl SideBar {
         self.multiSelect = !self.multiSelect;
         return SudokuEvent::MultiSelectBtn;
       },
+      //unselect all cells if no button was clicked
       _ => {
-        return SudokuEvent::None;
+        return SudokuEvent::UnselectAll;
       }
      }
   }

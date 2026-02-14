@@ -26,11 +26,9 @@ impl<'a> Renderer<'a> {
       .build()
       .map_err(|e| e.to_string()).unwrap();
 
-    //let ttfContext = sdl2::ttf::init().expect("Failed to init sdl_ttf");
     let textureCreator = canvas.texture_creator();
     let font = ttfContext
         .load_font("Menlo.ttc", 64).unwrap();
-
 
     Renderer {
       sdlContext,
@@ -39,6 +37,7 @@ impl<'a> Renderer<'a> {
       textureCreator
     }
   }
+
   pub fn getEventPump(&mut self) -> Result<sdl2::EventPump, String> {
     let eventPump = self.sdlContext.event_pump()?;
     Ok(eventPump)
@@ -47,20 +46,27 @@ impl<'a> Renderer<'a> {
   pub fn setColor(&mut self, color: Color) {
     self.canvas.set_draw_color(sdl2::pixels::Color::RGBA(color.0, color.1, color.2, color.3));
   }
+
   pub fn clearWindow(&mut self, color: Color) {
     self.setColor(color);
     self.canvas.clear();
   }
+
+  //fillangle rect
   pub fn renderFillRect(&mut self, color: Color, x: i32, y: i32, width: u32, height: u32) {
     self.setColor(color);
     let rect = sdl2::rect::Rect::new(x, y, width, height);
     self.canvas.fill_rect(rect).unwrap();
   }
+
+  //rectangle with just outline
   pub fn renderRect(&mut self, color: Color, x: i32, y: i32, width: u32, height: u32) {
     self.setColor(color);
     let rect = sdl2::rect::Rect::new(x, y, width, height);
     self.canvas.draw_rect(rect).unwrap();
   }
+
+  //text centered in a box
   pub fn renderCenteredText(&mut self, text: &str, color: Color, boxX: i32, boxY: i32, boxWidth: i32, boxHeight: i32) {
     let surface = self.font.render(text)
       .blended(color)
@@ -74,6 +80,7 @@ impl<'a> Renderer<'a> {
     let target = sdl2::rect::Rect::new(boxX + (boxWidth - query.width as i32) as i32 / 2, boxY as i32 + (boxHeight - query.height as i32) as i32 / 2, query.width, query.height);
     self.canvas.copy(&mut texture, None, Some(target)).unwrap();
   }
+  
   pub fn present(&mut self) {
     self.canvas.present();
   }
