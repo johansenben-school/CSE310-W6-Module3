@@ -1,9 +1,11 @@
 #![allow(non_snake_case)]
 
+extern crate rand;
 use crate::renderer;
 use crate::cell;
 use crate::util::*;
 use crate::logic;
+use rand::seq::SliceRandom;
 
 #[derive(PartialEq, Eq, Copy, Clone)]
 pub enum SelectedCell {
@@ -13,18 +15,19 @@ pub enum SelectedCell {
 
 pub struct Board {
   pub cells: [cell::Cell; 81],
-  //pub cellSelected: SelectedCell,
   pub cellsSelected: Vec<u8>
 }
 
 impl Board {
   pub fn new() -> Board {
     let empty = cell::Cell::newEmpty();
-    Board {
+    let mut board = Board {
       cells: [empty; 81],
-      //cellSelected: SelectedCell::None
       cellsSelected: vec![]
-    }
+    };
+    board.reset();
+
+    return board;
   }
   pub fn handleClick(&mut self, x: i32, y: i32) -> SudokuEvent {
     let lines = [ BORDER, THIN_LINE, THIN_LINE, THICK_LINE, THIN_LINE, THIN_LINE, THICK_LINE, THIN_LINE, THIN_LINE, BORDER ];
@@ -100,7 +103,7 @@ impl Board {
         let color: (u8,u8,u8,u8) = match self.cells[(y * 9 + x) as usize].state {
           cell::CellState::INCORRECT => (255,0,0,255),
           cell::CellState::USER_INPUT => (0,0,255,255),
-          cell::CellState::SOLVER_INPUT => (0,180,0,255),
+          cell::CellState::SOLVER_INPUT | cell::CellState::SOLVER_INPUT_LOCKED => (0,180,0,255),
           _ => (0,0,0,255)
         };
         renderer.renderCenteredText(self.cells[(y * 9 + x) as usize].getDisplayVal().as_str(), color, cellX, cellY, CELL_WIDTH, CELL_WIDTH);
@@ -108,8 +111,10 @@ impl Board {
     }
   }
   pub fn reset(&mut self) {
-    for cell in &mut self.cells {
-      cell.setCell(0, cell::CellState::EMPTY);
+    let mut rng = rand::thread_rng();
+    let puzzle = PUZZLES.choose(&mut rng).unwrap_or(&[0;81]);
+    for i in 0..81_u8 {
+      self.cells[i as usize].setCell(puzzle[i as usize], if puzzle[i as usize] != 0 { cell::CellState::LOCKED } else { cell::CellState::EMPTY });
     }
     self.unselectCells();
   }

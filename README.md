@@ -26,5 +26,6 @@ Sudoku game with a solve button made using Rust and SDL2
 # Time Log
 - Monday, Feb. 2 - 4 hours
 - Friday, Feb. 6 - 4 hours
-- Thurs, Feb 12 - 6 hours (10:30-1, 3-6:30)
-- Friday, Feb. 13 - 3 hours (10-11:30, 1-2:30)
+- Thurs, Feb 12 - 6 hours 
+- Friday, Feb. 13 - 4 hours 
+- Saturday, Feb. 14 - 3 hours

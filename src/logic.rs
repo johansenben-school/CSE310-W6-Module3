@@ -1,8 +1,9 @@
 #![allow(non_snake_case)]
 
-use crate::cell::{Cell, CellState};
+use crate::{cell::{Cell, CellState}, logic::getValidNums::placeEasyCells};
 pub mod getValidNums {
-    use crate::cell::Cell;
+    use crate::cell::{Cell, CellState};
+
 
   pub fn inRow(board: &[Cell; 81], index: i8, validNums: &mut Vec<u8>) {
     let y: i8 = index / 9;
@@ -39,6 +40,9 @@ pub mod getValidNums {
     for y in (boxY * 3)..(boxY * 3 + 3) {
       for x in (boxX * 3)..(boxX * 3 + 3) {
         let i: i8 = y * 9 + x;
+        if i == index {
+          continue;
+        }
         let cell: Cell = board[i as usize];
         if !cell.isEmpty() {
           validNums.retain(|&val| val != cell.getVal());
@@ -51,6 +55,65 @@ pub mod getValidNums {
     for func in funcs {
       func(board, index, validNums);
     }
+  }
+
+  pub fn placeEasyCells(board: &mut [Cell; 81], funcs: &[fn(&[Cell;81], i8, &mut Vec<u8>)]) {
+    let mut changedVal;
+    loop {
+      changedVal = false;
+      for i in 0..81_i8 {
+        if !board[i as usize].canSolverChange() {
+          continue;
+        }
+        let mut validNums: Vec<u8> = vec![1,2,3,4,5,6,7,8,9];
+        fromDispatch(board, i, &mut validNums, &funcs);
+
+        if validNums.len() == 1 {
+          board[i as usize].setCell(validNums[0], CellState::SOLVER_INPUT_LOCKED);
+          changedVal = true;
+        }
+      }
+
+      let mut candidates: Vec<Vec<u8>> = vec![vec![]; 81];
+      for i in 0..81 {
+          if board[i].canSolverChange() {
+              let mut valid = vec![1,2,3,4,5,6,7,8,9];
+              fromDispatch(board, i as i8, &mut valid, &funcs);
+              candidates[i] = valid;
+          }
+      }
+      for rowOrCol in 0..9_u8 {
+        for num in 1..=9_u8 {
+          let mut countInRow: u8 = 0;
+          let mut countInCol: u8 = 0;
+          let mut lastIndexInRowToChange: i8 = -1;
+          let mut lastIndexInColToChange: i8 = -1;
+          for rowOrCol2 in 0..9_u8 {
+            if candidates[(rowOrCol * 9 + rowOrCol2) as usize].contains(&num) {
+              lastIndexInRowToChange = (rowOrCol * 9 + rowOrCol2) as i8;
+              countInRow += 1;
+            }
+            if candidates[(rowOrCol2 * 9 + rowOrCol) as usize].contains(&num) {
+              lastIndexInColToChange = (rowOrCol2 * 9 + rowOrCol) as i8;
+              countInCol += 1;
+            }
+          }
+          if countInRow == 1 {
+            board[lastIndexInRowToChange as usize].setCell(num, CellState::SOLVER_INPUT_LOCKED);
+            changedVal = true;
+          }
+          if countInCol == 1 {
+            board[lastIndexInColToChange as usize].setCell(num, CellState::SOLVER_INPUT_LOCKED);
+            changedVal = true;
+          }
+        }
+      }
+
+      if !changedVal {
+        break;
+      }
+    }
+    
   }
 }
 
@@ -79,8 +142,10 @@ pub fn solve(board: &mut [Cell; 81]) -> SolveState {
   let mut tryVal: u8 = 1;
   let mut isBackwards = false;
 
+  placeEasyCells(board, &validNumsFuncs);
+
   let mut count: u32 = 0;
-  while count < 100000 {
+  while count < 500000 {
     //increment count to make sure that loop isn't infinite
     count += 1;
 

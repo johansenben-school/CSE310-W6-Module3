@@ -15,14 +15,14 @@ impl SideBar {
   pub fn new() -> Self {
     SideBar {
       numBtnCoords: [ 
-      (0, 0), (110, 0), (220, 0),
-      (0, 110), (110, 110), (220, 110),
-      (0, 220), (110, 220), (220, 220)
+      (0, 0), (CELL_WIDTH + 10, 0), (CELL_WIDTH * 2 + 20, 0),
+      (0, CELL_WIDTH + 10), (CELL_WIDTH + 10, CELL_WIDTH + 10), (CELL_WIDTH * 2 + 20, CELL_WIDTH + 10),
+      (0, CELL_WIDTH * 2 + 20), (CELL_WIDTH + 10, CELL_WIDTH * 2 + 20), (CELL_WIDTH * 2 + 20, CELL_WIDTH * 2 + 20)
      ], 
-     solveBtn: (0, 440, 320, 100),
-     eraseBtn: (0, 330, 100, 100),
-     resetBtn: (110, 330, 100, 100),
-     multiSelectBtn: (220, 330, 100, 100),
+     solveBtn: (0, CELL_WIDTH * 4 + 40, CELL_WIDTH * 3 + 20, CELL_WIDTH),
+     eraseBtn: (0, CELL_WIDTH * 3 + 30, CELL_WIDTH, CELL_WIDTH),
+     resetBtn: (CELL_WIDTH + 10, CELL_WIDTH * 3 + 30, CELL_WIDTH, CELL_WIDTH),
+     multiSelectBtn: (CELL_WIDTH * 2 + 20, CELL_WIDTH * 3 + 30, CELL_WIDTH, CELL_WIDTH),
      multiSelect: false
     }
   }

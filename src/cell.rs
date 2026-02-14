@@ -5,7 +5,7 @@ use crate::util::*;
 #[derive(PartialEq, Eq, Copy, Clone)]
 #[allow(non_camel_case_types)]
 pub enum CellState {
-  EMPTY, LOCKED, INCORRECT, SOLVER_INPUT, USER_INPUT
+  EMPTY, LOCKED, INCORRECT, SOLVER_INPUT, USER_INPUT, SOLVER_INPUT_LOCKED
 }
 #[derive(Copy, Clone)]
 pub struct Cell {
@@ -50,7 +50,7 @@ impl Cell {
     self.state == CellState::LOCKED
   }
   pub fn canSolverChange(self) -> bool {
-    !self.isLocked() && self.state != CellState::USER_INPUT
+    !self.isLocked() && self.state != CellState::USER_INPUT && self.state != CellState::SOLVER_INPUT_LOCKED
   }
   pub fn canUserChange(self) -> bool {
     !self.isLocked() && self.state != CellState::SOLVER_INPUT
