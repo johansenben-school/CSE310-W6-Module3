@@ -2,7 +2,7 @@
 
 Sudoku game with a solve button made using Rust and SDL2
 
-[Software Demo Video](http://youtube.link.goes.here)
+[Software Demo Video](https://youtu.be/gqfLQDAr-NQ)
 
 # Development Environment
 
@@ -13,8 +13,7 @@ Sudoku game with a solve button made using Rust and SDL2
 
 # Useful Websites
 
-- [Web Site Name](http://url.link.goes.here)
-- [Web Site Name](http://url.link.goes.here)
+- [Tech With Tim - Rust Programming Playlist](https://www.youtube.com/playlist?list=PLzMcBGfZo4-nyLTlSRBvo0zjSnCnqjHYQ)
 
 # Future Work
 
